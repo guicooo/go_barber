@@ -1,13 +1,16 @@
 import { compare } from "bcryptjs";
 import { getRepository } from "typeorm";
+import { sign } from 'jsonwebtoken'
+
 import User from "../models/User";
+import auth from "../config/auth";
 
 interface Request {
   email: string,
   password: string
 }
 class AuthenticateUserService {
-  public async execute({ email, password }: Request): Promise<{ user: User }> {
+  public async execute({ email, password }: Request): Promise<{ user: User; token: string }> {
 
     const userRepository = getRepository(User)
 
@@ -24,8 +27,14 @@ class AuthenticateUserService {
     }
 
     //USUARIO AUTENTICADO
+
+    const token = sign({}, auth.jwt.subject, {
+      subject: user.id,
+      expiresIn: auth.jwt.expiresIn
+    })
     return {
-      user
+      user,
+      token
     }
 
   }
