@@ -1,6 +1,13 @@
+import { sub } from "date-fns";
 import { NextFunction, Request, Response } from "express";
 import { verify } from "jsonwebtoken";
 import auth from "../config/auth";
+
+interface TokenPayload {
+  iat: number,
+  exp: number,
+  sub: string,
+}
 
 export default function ensureAuthenticated(request: Request, response: Response, next: NextFunction): void {
 
@@ -16,10 +23,13 @@ export default function ensureAuthenticated(request: Request, response: Response
   try {
     const decoded = verify(token, auth.jwt.subject);
 
-    console.log(decoded);
+    const { sub } = decoded as TokenPayload;
+
+    request.user = {
+      id: sub
+    }
 
     return next();
-
   } catch {
     throw new Error('Invalid  JWT token')
   }
