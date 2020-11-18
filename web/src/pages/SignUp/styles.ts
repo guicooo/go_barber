@@ -1,9 +1,18 @@
-import styled from 'styled-components';
+import styled, { keyframes } from 'styled-components';
 import { shade } from 'polished';
 
 import backgroundImage from '../../assets/sign-up-background.png';
 
-
+const appearFromRight = keyframes`
+from {
+  opacity: 0;
+  transform: translateX(50px);
+}
+to {
+  opacity: 1;
+  transform: translateX(0);
+}
+`;
 
 export const Container = styled.div`
   height: 100vh;
@@ -24,6 +33,7 @@ export const AnimationContainer = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
+  animation: ${appearFromRight} 1s;
   form {
     margin: 80px 0;
     width: 340px;
