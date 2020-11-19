@@ -9,8 +9,8 @@ import Input from '../../components/Input';
 import Button from '../../components/Button';
 
 import getValidationsErrors from '../../utils/getValidationErrors';
-// import { useAuth } from '../../hooks/auth';
-// import { useToast } from '../../hooks/toast';
+import { useAuth } from '../../hooks/auth';
+import { useToast } from '../../hooks/toast';
 
 import logo from '../../assets/logo.svg';
 
@@ -22,9 +22,9 @@ interface SignInFormData {
 }
 
 const SignIn: React.FC = () => {
-//   const history = useHistory();
-//   const { signIn } = useAuth();
-//   const { addToast } = useToast();
+  // const history = useHistory();
+  const { signIn } = useAuth();
+  const { addToast } = useToast();
   const formRef = useRef<FormHandles>(null);
 
   const handleSubmit = useCallback(
@@ -42,7 +42,7 @@ const SignIn: React.FC = () => {
           abortEarly: false,
         });
 
-        // await signIn({ ...data });
+        await signIn({ ...data });
         // history.push('/dashboard');
       } catch (err) {
         if (err instanceof Yup.ValidationError) {
@@ -50,15 +50,14 @@ const SignIn: React.FC = () => {
           formRef.current?.setErrors(errors);
         }
 
-        // addToast({
-        //   type: 'error',
-        //   title: 'Erro na autenticação!',
-        //   description: 'Ocorreu um erro ao fazer login, cheque as credenciais.',
-        // });
+        addToast({
+          type: 'error',
+          title: 'Erro na autenticação!',
+          description: 'Ocorreu um erro ao fazer login, cheque as credenciais.',
+        });
       }
     },
-    [],
-    // [history, signIn, addToast],
+    [signIn, addToast],
   );
 
   return (
