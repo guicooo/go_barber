@@ -3,7 +3,7 @@ import { FiLogIn, FiMail, FiLock } from 'react-icons/fi';
 import { FormHandles } from '@unform/core';
 import { Form } from '@unform/web';
 import * as Yup from 'yup';
-// import { Link, useHistory } from 'react-router-dom';
+import { Link, useHistory } from 'react-router-dom';
 
 import Input from '../../components/Input';
 import Button from '../../components/Button';
@@ -22,7 +22,7 @@ interface SignInFormData {
 }
 
 const SignIn: React.FC = () => {
-  // const history = useHistory();
+  const history = useHistory();
   const { signIn } = useAuth();
   const { addToast } = useToast();
   const formRef = useRef<FormHandles>(null);
@@ -43,7 +43,7 @@ const SignIn: React.FC = () => {
         });
 
         await signIn({ ...data });
-        // history.push('/dashboard');
+        history.push('/dashboard');
       } catch (err) {
         if (err instanceof Yup.ValidationError) {
           const errors = getValidationsErrors(err);
@@ -57,7 +57,7 @@ const SignIn: React.FC = () => {
         });
       }
     },
-    [signIn, addToast],
+    [history, signIn, addToast],
   );
 
   return (
@@ -78,13 +78,13 @@ const SignIn: React.FC = () => {
             />
             <Button type="submit">Entrar</Button>
 
-            {/* <Link to="/forgot-password">Esqueci minha senha</Link> */}
+            <Link to="/forgot-password">Esqueci minha senha</Link>
           </Form>
 
-          {/* <Link to="/signup">
+          <Link to="/signup">
             <FiLogIn />
             Criar conta
-          </Link> */}
+          </Link>
         </AnimationContainer>
       </Content>
       <Background />
