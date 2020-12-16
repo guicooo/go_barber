@@ -1,10 +1,10 @@
 import { getRepository } from "typeorm";
-import User from "../models/User";
 import path from 'path'
 import fs from 'fs'
 
-import uploadConfig from '../config/upload'
-import AppError from "../errors/AppErrors";
+import User from "../infra/typeorm/entities/User";
+import uploadConfig from '@config/upload'
+import AppError from "@shared/errors/AppErrors";
 
 interface Request {
     user_id: string;

@@ -1,8 +1,7 @@
-import { sub } from "date-fns";
 import { NextFunction, Request, Response } from "express";
 import { verify } from "jsonwebtoken";
-import auth from "../config/auth";
-import AppError from "../errors/AppErrors";
+import auth from "@config/auth";
+import AppError from "@shared/errors/AppErrors";
 
 interface TokenPayload {
   iat: number,
@@ -36,4 +35,3 @@ export default function ensureAuthenticated(request: Request, response: Response
   }
 
 }
-767
