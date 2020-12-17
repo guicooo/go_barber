@@ -1,44 +1,64 @@
-import { compare } from "bcryptjs";
-import { getRepository } from "typeorm";
-import { sign } from 'jsonwebtoken'
+import { sign } from 'jsonwebtoken';
+import { inject, injectable } from 'tsyringe';
 
-import User from "../infra/typeorm/entities/User";
-import auth from "@config/auth";
-import AppError from "@shared/errors/AppErrors";
+import AppError from '@shared/errors/AppErrors';
+import authConfig from '@config/auth';
+import IUsersRepository from '../repositories/IUsersRepository';
+import IHashProvider from '../providers/HashProvider/models/IHashProvider';
 
-interface Request {
-  email: string,
-  password: string
+import User from '../infra/typeorm/entities/User';
+
+interface IRequestDTO {
+  email: string;
+  password: string;
 }
-class AuthenticateUserService {
-  public async execute({ email, password }: Request): Promise<{ user: User; token: string }> {
 
-    const userRepository = getRepository(User)
+interface IResponseDTO {
+  user: User;
+  token: string;
+}
 
-    const user = await userRepository.findOne({ where: { email } })
+@injectable()
+class CreateSessionService {
+  constructor(
+    @inject('UsersRepository')
+    private usersRepository: IUsersRepository,
 
-    if(!user) {
-      throw new AppError('Incorrect email / password combination', 401)
+    @inject('HashProvider')
+    private hashProvider: IHashProvider,
+  ) {}
+
+  public async execute({
+    email,
+    password,
+  }: IRequestDTO): Promise<IResponseDTO> {
+    const user = await this.usersRepository.findByEmail(email);
+
+    if (!user) {
+      throw new AppError('Incorrect email/password combination.', 401);
     }
 
-    const passwordMatched = await compare(password, user.password)
+    const passwordMatched = await this.hashProvider.compareHash(
+      password,
+      user.password,
+    );
 
-    if(!passwordMatched) {
-      throw new AppError('Incorrect email / password combination', 401)
+    if (!passwordMatched) {
+      throw new AppError('Incorrect email/password combination.', 401);
     }
 
-    //USUARIO AUTENTICADO
+    const { subject, expiresIn } = authConfig.jwt;
 
-    const token = sign({}, auth.jwt.subject, {
+    const token = sign({}, subject, {
       subject: user.id,
-      expiresIn: auth.jwt.expiresIn
-    })
+      expiresIn,
+    });
+
     return {
       user,
-      token
-    }
-
+      token,
+    };
   }
 }
 
-export default AuthenticateUserService;
+export default CreateSessionService;

@@ -1,36 +1,43 @@
-import { startOfHour } from "date-fns";
-import { getCustomRepository } from "typeorm";
-import AppError from "@shared/errors/AppErrors";
-import Appointments from "../infra/typeorm/entities/Appointments";
-import AppointmentsRepository from "../infra/typeorm/repositories/AppointmentsRepository";
+import { startOfHour } from 'date-fns';
+import { injectable, inject } from 'tsyringe';
 
-interface Request {
-  date: Date,
-  provider_id: string
+import AppError from '@shared/errors/AppErrors';
+import Appointment from '../infra/typeorm/entities/Appointments';
+import IAppointmentsRepository from '../repositories/IAppointmentsRepository';
+
+interface IRequestDTO {
+  provider_id: string;
+  date: Date;
 }
 
+@injectable()
+class CreateAppointmentService {
+  constructor(
+    @inject('AppointmentsRepository')
+    private appointmentsRepository: IAppointmentsRepository,
+  ) {}
 
-class CreateAppointmentsService {
-  public async execute({ date, provider_id }: Request): Promise<Appointments> {
+  public async execute({
+    provider_id,
+    date,
+  }: IRequestDTO): Promise<Appointment> {
+    const parsedDate = startOfHour(date);
 
-    const appointmentsRepository = getCustomRepository(AppointmentsRepository);
+    const findAppointmentInSameDate = await this.appointmentsRepository.findByDate(
+      parsedDate,
+    );
 
-    const appointmentsDate = startOfHour(date);
-    const findAppointmentsInSameDate = await appointmentsRepository.findByDate(appointmentsDate);
-
-    if (findAppointmentsInSameDate) {
-      throw new AppError('This appointment is already booked')
+    if (findAppointmentInSameDate) {
+      throw new AppError('This appointment is already booked');
     }
 
-    const appointment = await appointmentsRepository.create({
+    const appointment = await this.appointmentsRepository.create({
       provider_id,
-      date: appointmentsDate,
+      date: parsedDate,
     });
 
-
     return appointment;
-
   }
 }
 
-export default CreateAppointmentsService;
+export default CreateAppointmentService;
