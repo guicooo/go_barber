@@ -1,11 +1,11 @@
 import { getRepository, Repository } from 'typeorm';
 
-import IUsersRepository from '@modules/users/repositories/IUsersRepository';
+import IUserRepository from '@modules/users/repositories/IUserRepository';
 import ICreateUserDTO from '@modules/users/dtos/ICreateUserDTO';
 
 import User from '../entities/User';
 
-class AppointmentsRepository implements IUsersRepository {
+class AppointmentsRepository implements IUserRepository {
   private ormRepository: Repository<User>;
 
   constructor() {
