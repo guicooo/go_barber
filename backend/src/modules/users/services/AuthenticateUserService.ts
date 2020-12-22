@@ -1,12 +1,12 @@
 import { sign } from 'jsonwebtoken';
 import { inject, injectable } from 'tsyringe';
 
-import AppError from '@shared/errors/AppErrors';
 import authConfig from '@config/auth';
-import IUserRepository from '../repositories/IUserRepository';
+import IUsersRepository from '../repositories/IUserRepository';
 import IHashProvider from '../providers/HashProvider/models/IHashProvider';
 
 import User from '../infra/typeorm/entities/User';
+import AppError from '@shared/errors/AppErrors';
 
 interface IRequestDTO {
   email: string;
@@ -21,8 +21,8 @@ interface IResponseDTO {
 @injectable()
 class CreateSessionService {
   constructor(
-    @inject('UserRepository')
-    private usersRepository: IUserRepository,
+    @inject('UsersRepository')
+    private usersRepository: IUsersRepository,
 
     @inject('HashProvider')
     private hashProvider: IHashProvider,

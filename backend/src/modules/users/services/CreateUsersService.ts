@@ -1,12 +1,12 @@
-import { injectable, inject } from 'tsyringe';
+import { inject, injectable } from 'tsyringe';
 
+import IUsersRepository from '../repositories/IUserRepository';
+import IHashProvider from '../providers/HashProvider/models/IHashProvider';
+
+import User from '../infra/typeorm/entities/User';
 import AppError from '@shared/errors/AppErrors';
-import IUserRepository from '@modules/users/repositories/IUserRepository';
-import IHashProvider from '@modules/users/providers/HashProvider/models/IHashProvider';
 
-import User from '@modules/users/infra/typeorm/entities/User';
-
-interface IRequest {
+interface IRequestDTO {
   name: string;
   email: string;
   password: string;
@@ -15,18 +15,18 @@ interface IRequest {
 @injectable()
 class CreateUserService {
   constructor(
-    @inject('UserRepository')
-    private usersRepository: IUserRepository,
+    @inject('UsersRepository')
+    private usersRepository: IUsersRepository,
 
     @inject('HashProvider')
     private hashProvider: IHashProvider,
   ) {}
 
-  async execute({ name, email, password }: IRequest): Promise<User> {
+  public async execute({ name, email, password }: IRequestDTO): Promise<User> {
     const checkUserExists = await this.usersRepository.findByEmail(email);
 
     if (checkUserExists) {
-      throw new AppError('Email address already used.');
+      throw new AppError('Email address already used');
     }
 
     const hashedPassword = await this.hashProvider.generatehash(password);
